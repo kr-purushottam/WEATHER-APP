@@ -227,6 +227,14 @@ h1{
     margin-bottom: 1px;
 }
 
+.error-container{
+    display: none;
+}
+
+.error-container.active{
+    display: flex;
+}
+
 /* .form-container.active{
     scale: 1;
     opacity: 1;

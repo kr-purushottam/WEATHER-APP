@@ -5,6 +5,7 @@ const grantAccessContainer = document.querySelector('.grant-location-container')
 const searchForm = document.querySelector("[data-searchForm]");//  ++
 const loadingScreen = document.querySelector('.loading-container');  //++
 const userInfoContainer = document.querySelector(".user-info-container"); //++ weathrt info result display krne wala
+const errorContainer = document.querySelector('.error-container');
 
 //initaially vairables need
 let oldTab = userTab;
@@ -22,14 +23,16 @@ function switchTab(newTab) {
             //kya search form wala container is invisible, if yes then make it visible
             grantAccessContainer.classList.remove('active');
             userInfoContainer.classList.remove('active');
+            errorContainer.classList.remove('active');
             searchForm.classList.add('active');
-            console.log('switchTab() k if wala dabba');
+            //console.log('switchTab() k if wala dabba');
         }
         else{
             //main phale search wale tab pr tha,  ab your watheer tab visible krna hai
+            errorContainer.classList.remove('active');
             searchForm.classList.remove('active');
             userInfoContainer.classList.remove('active');
-            console.log('switchTab() k else wala dabba');
+            //console.log('switchTab() k else wala dabba');
            
            //ab mai your weather tab me aaya hu, toh weather bhi display krna pdega , so let's check local storage first for coordinates , if we have saved them there
             getfromSessionStorage();
@@ -75,8 +78,9 @@ async function fetchUserWeatherInfo(coordinates) {
 
         loadingScreen.classList.remove('active');
         userInfoContainer.classList.add('active');
+        // errorContainer.classList.remove('active');
 
-        console.log('from detchUserweatherinfo() 75');
+        //console.log('from detchUserweatherinfo() 75');
         renderWeatherInfo(data);
     }
     catch(err) {
@@ -87,6 +91,13 @@ async function fetchUserWeatherInfo(coordinates) {
 
 function renderWeatherInfo(weatherInfo) {
     //FIRSTLY WE HAVE TO FETCH THE ELEMENTS
+    //const code = weatherInfo?.cod;
+    if(weatherInfo?.cod === "404") {
+        console.log('call from error');
+        userInfoContainer.classList.remove('active');
+        errorContainer.classList.add("active"); 
+        return;
+    }
     const cityName = document.querySelector('[data-cityName]');
     const countryIcon = document.querySelector('[data-countryIcon]');
     const desc = document.querySelector('[data-weatherDesc]');
@@ -141,6 +152,8 @@ searchForm.addEventListener("submit", (e)=> {
     let cityName = searchInput.value;
 
     if(cityName === "") {
+        userInfoContainer.classList.remove('active');
+        alert('Please enter the City Name');
         return;
     }
     else{
@@ -149,6 +162,7 @@ searchForm.addEventListener("submit", (e)=> {
 })
 
 async function fetchSearchWeatherInfo(cityName) {
+    errorContainer.classList.remove('active');
     loadingScreen.classList.add('active');
     userInfoContainer.classList.remove('active');
     grantAccessContainer.classList.remove('active');
@@ -158,6 +172,7 @@ async function fetchSearchWeatherInfo(cityName) {
         const data = await response.json();
         loadingScreen.classList.remove('active');
         userInfoContainer.classList.add('active');
+        errorContainer.classList.remove('active');
         renderWeatherInfo(data);
     }
     catch(err) {
